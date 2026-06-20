@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#667eea">
+  <title>color-prince 画笔王子 - 商品问题反馈系统</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    /* ========== 卡片容器（共用） ========== */
+    .card {
+      background: #fff;
+      padding: 40px 32px;
+      border-radius: 24px;
+      text-align: center;
+      max-width: 400px;
+      width: 100%;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+    }
+
+    .brand-logo {
+      font-size: 56px;
+      margin-bottom: 12px;
+      line-height: 1;
+    }
+
+    .brand-title {
+      font-size: 22px;
+      color: #1f2937;
+      font-weight: 700;
+      margin-bottom: 4px;
+      letter-spacing: 0.5px;
+    }
+
+    .brand-title .en {
+      color: #667eea;
+      font-size: 20px;
+    }
+
+    .brand-subtitle {
+      font-size: 13px;
+      color: #6b7280;
+      margin-bottom: 28px;
+    }
+
+    /* ========== 分隔线 ========== */
+    .divider {
+      height: 1px;
+      background: #e5e7eb;
+      margin: 20px 0;
+    }
+
+    /* ========== 加载状态 ========== */
+    .loading-spinner {
+      width: 44px;
+      height: 44px;
+      border: 4px solid #f3f4f6;
+      border-top: 4px solid #667eea;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 12px auto 16px;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .loading-text {
+      color: #10b981;
+      font-size: 15px;
+      font-weight: 500;
+    }
+
+    .loading-hint {
+      color: #9ca3af;
+      font-size: 12px;
+      margin-top: 8px;
+    }
+
+    .manual-link {
+      display: inline-block;
+      margin-top: 16px;
+      color: #667eea;
+      font-size: 13px;
+      text-decoration: none;
+      padding: 6px 14px;
+      border-radius: 999px;
+      background: #eef2ff;
+      transition: background 0.2s;
+    }
+
+    .manual-link:active {
+      background: #e0e7ff;
+    }
+
+    /* ========== 离线状态 ========== */
+    .offline-icon {
+      width: 80px;
+      height: 80px;
+      background: #fef3c7;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 16px;
+      font-size: 40px;
+    }
+
+    .offline-title {
+      font-size: 18px;
+      color: #1f2937;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .offline-subtitle {
+      font-size: 13px;
+      color: #6b7280;
+      margin-bottom: 20px;
+    }
+
+    .info-block {
+      text-align: left;
+      background: #f9fafb;
+      border-radius: 12px;
+      padding: 14px 16px;
+      margin-bottom: 12px;
+    }
+
+    .info-block .label {
+      display: flex;
+      align-items: center;
+      font-size: 13px;
+      color: #374151;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .info-block .label .emoji {
+      margin-right: 6px;
+      font-size: 16px;
+    }
+
+    .info-block .content {
+      font-size: 12.5px;
+      color: #6b7280;
+      line-height: 1.7;
+      padding-left: 22px;
+    }
+
+    .info-block .content .highlight {
+      color: #dc2626;
+      font-weight: 500;
+    }
+
+    .info-block .contact-name {
+      color: #1f2937;
+      font-weight: 600;
+      background: #fff;
+      padding: 2px 10px;
+      border-radius: 6px;
+      display: inline-block;
+      margin-top: 2px;
+    }
+
+    .action-row {
+      display: flex;
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    .btn {
+      flex: 1;
+      padding: 10px 14px;
+      border: none;
+      border-radius: 12px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-decoration: none;
+      text-align: center;
+    }
+
+    .btn-primary {
+      background: #667eea;
+      color: white;
+    }
+
+    .btn-primary:active {
+      background: #5a67d8;
+      transform: scale(0.98);
+    }
+
+    .btn-secondary {
+      background: #f3f4f6;
+      color: #374151;
+    }
+
+    .btn-secondary:active {
+      background: #e5e7eb;
+      transform: scale(0.98);
+    }
+
+    .copy-toast {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%) translateY(-100px);
+      background: #1f2937;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 999px;
+      font-size: 13px;
+      opacity: 0;
+      transition: all 0.3s ease;
+      z-index: 9999;
+    }
+
+    .copy-toast.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+
+    /* ========== 状态切换动画 ========== */
+    .screen { display: none; }
+    .screen.active { display: block; animation: fadeIn 0.4s ease; }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 跳转中状态 -->
+    <div class="card">
+    <div class="screen" id="loadingScreen">
+      <div class="brand-logo">🎨</div>
+      <div class="brand-title"><span class="en">color-prince</span> 画笔王子</div>
+      <div class="brand-subtitle">商品问题反馈系统</div>
+      <div class="loading-spinner"></div>
+      <div class="loading-text" id="loadingMessage">正在连接服务器，请稍候…</div>
+      <div class="loading-hint" id="tryCount"></div>
+      <a href="#" class="manual-link" id="manualJump" style="display:none;">如未自动跳转，请点此重试</a>
+    </div>
+
+    <!-- 离线/下班状态 -->
+    <div class="screen" id="offlineScreen">
+      <div class="offline-icon">💤</div>
+      <div class="offline-title">服务暂时不可用</div>
+      <div class="offline-subtitle">系统服务器未启动，请在工作时间内使用</div>
+
+      <div class="divider"></div>
+
+      <div class="info-block">
+        <div class="label"><span class="emoji">📅</span>工作时间</div>
+        <div class="content">
+          周一至周六 <strong>9:00 — 17:00</strong><br>
+          （节假日除外）
+        </div>
+      </div>
+
+      <div class="info-block">
+        <div class="label"><span class="emoji">⏳</span>处理周期</div>
+        <div class="content">
+          本系统<span class="highlight">每周二</span>统一处理问题反馈<br>
+          如您在周二提交问题，将顺延至下周处理
+        </div>
+      </div>
+
+      <div class="info-block">
+        <div class="label"><span class="emoji">🚨</span>紧急问题说明</div>
+        <div class="content">
+          本系统不处理紧急问题<br>
+          如有紧急问题，请私信：
+          <div class="contact-name">商品部 · 廖梓泳</div>
+        </div>
+      </div>
+
+      <div class="action-row">
+        <button class="btn btn-secondary" onclick="copyContact()">📤 复制联系方式</button>
+        <button class="btn btn-primary" onclick="tryRedirect(true)">🔄 重新尝试</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="copy-toast" id="toast">已复制，请粘贴到微信</div>
+
+  <script>
+    // ============================================================
+    // 🔧 配置区：隧道地址 + 备用固定入口
+    // ============================================================
+    // 本地服务器通过 cloudflared 暴露的隧道地址（按顺序检测）
+    const TUNNEL_URLS = [
+      'https://newton-banners-freely-eden.trycloudflare.com',
+      'https://chronic-shaft-controllers-recommend.trycloudflare.com',
+      'https://advanced-gradually-folks-logo.trycloudflare.com',
+      'https://wagner-bringing-interracial-url.trycloudflare.com',
+      'https://msg-pub-deeper-bradford.trycloudflare.com',
+      'https://beans-proved-live-app.trycloudflare.com',
+      'https://bases-cent-tradition-thompson.trycloudflare.com',
+      'https://aberdeen-latitude-margin-alliance.trycloudflare.com',
+      'https://flush-gear-creature-divorce.trycloudflare.com',
+      'https://accounting-aaron-limit-cycling.trycloudflare.com',
+      'https://claire-kurt-songs-louise.trycloudflare.com'
+    ];
+
+    // ============================================================
+    // 核心1：带超时的 CORS 检测（获取真实 HTTP 状态码，2xx 才视为在线）
+    // ============================================================
+    function fetchCorsStatus(url, timeout) {
+      return new Promise((resolve) => {
+        const controller = new AbortController();
+        const timer = setTimeout(() => controller.abort(), timeout);
+        fetch(url + '/api/health', {
+          method: 'GET',
+          mode: 'cors',
+          cache: 'no-store',
+          signal: controller.signal
+        })
+          .then((res) => { clearTimeout(timer); resolve({ url, status: res.status }); })
+          .catch(() => { clearTimeout(timer); resolve({ url, status: 0 }); });
+      });
+    }
+
+    // ============================================================
+    // 核心2：并行检测所有 tunnel，最快返回 2xx 的那个立即跳转
+    //   比串行检测快 10 倍以上
+    // ============================================================
+    async function tryRedirect() {
+      showScreen('loadingScreen');
+      const msgEl = document.getElementById('loadingMessage');
+      const tryEl = document.getElementById('tryCount');
+      msgEl.textContent = '正在检测可用服务器…';
+      tryEl.textContent = '';
+
+      // 并行检测所有 tunnel，每个最多 4 秒
+      const results = TUNNEL_URLS.map((url) => fetchCorsStatus(url, 4000));
+      let okCount = 0;
+      let total = TUNNEL_URLS.length;
+
+      // 逐个 resolve，只要遇到 2xx 就立即跳转
+      for (let i = 0; i < results.length; i++) {
+        const r = await results[i];
+        if (r.status >= 200 && r.status < 300) {
+          msgEl.textContent = '检测成功，正在跳转…';
+          tryEl.textContent = '';
+          window.location.href = r.url;
+          return;
+        }
+        okCount = i + 1;
+        tryEl.textContent = '（已检测 ' + okCount + ' / ' + total + '）';
+      }
+
+      // 全部失败 → 停留在"管理员下班"页面（绝不对接到乱码页）
+      showScreen('offlineScreen');
+    }
+
+    // ============================================================
+    // UI：屏幕切换 + Toast
+    // ============================================================
+    function showScreen(id) {
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+    }
+
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 2000);
+    }
+
+    function copyContact() {
+      const text = '商品部·廖梓泳';
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(() => showToast('已复制：商品部·廖梓泳'));
+      } else {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        try { document.execCommand('copy'); showToast('已复制：商品部·廖梓泳'); } catch (e) { showToast('复制失败，请手动记录'); }
+        document.body.removeChild(ta);
+      }
+    }
+
+    // ============================================================
+    // 启动：默认先显示"管理员下班"页面，确保用户永远不会看到乱码
+    // 然后在后台静默尝试检测，发现可用服务器时自动跳转
+    // ============================================================
+    showScreen('offlineScreen');
+    setTimeout(tryRedirect, 300);
+  </script>
+</body>
+</html>
